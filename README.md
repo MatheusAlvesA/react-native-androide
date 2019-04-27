@@ -4,11 +4,11 @@ This library is under development, this means that it can not be used in product
 
 ## Getting started
 
-`$ npm install react-native-android --save`
+`$ npm install react-native-androide --save`
 
 ### Mostly automatic installation
 
-`$ react-native link react-native-android`
+`$ react-native link react-native-androide`
 
 ### Manual installation
 
@@ -31,7 +31,7 @@ This library is under development, this means that it can not be used in product
 
 ## Usage
 ```javascript
-import RNAndroid from 'react-native-android';
+import RNAndroid from 'react-native-androide';
 
 // TODO
 RNAndroid;
