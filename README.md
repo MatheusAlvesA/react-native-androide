@@ -20,12 +20,12 @@ This library is under development, this means that it can not be used in product
   - Add `new RNAndroidPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```
-  	include ':react-native-android'
-  	project(':react-native-android').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-android/android')
+  	include ':react-native-androide'
+  	project(':react-native-androide').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-androide/android')
   	```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
-      compile project(':react-native-android')
+      compile project(':react-native-androide')
   	```
 
 
