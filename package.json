@@ -1,6 +1,6 @@
 {
   "name": "react-native-androide",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A fully library to integrate react applications with Android native API",
   "main": "index.js",
   "author": "Matheus Alves de Andrade",
