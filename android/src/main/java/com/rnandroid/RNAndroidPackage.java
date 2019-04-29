@@ -15,7 +15,8 @@ public class RNAndroidPackage implements ReactPackage {
 
       List<NativeModule> modules = new ArrayList<>();
 
-      modules.add(new ToastModule(reactContext));
+	    modules.add(new ToastModule(reactContext));
+	    modules.add(new StatusModule(reactContext));
 
       return modules;
     }

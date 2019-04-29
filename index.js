@@ -1,8 +1,9 @@
 
 import { NativeModules } from 'react-native';
 
-const { AndroidToast } = NativeModules;
+const { AndroidToast, AndroidSystemStatus } = NativeModules;
 
 module.exports = {
-  AndroidToast
+  AndroidToast,
+  AndroidSystemStatus
 };
