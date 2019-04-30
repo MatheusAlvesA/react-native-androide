@@ -1,6 +1,8 @@
 package com.rnandroid;
 
 import android.os.BatteryManager;
+import android.content.Intent;
+import android.content.IntentFilter;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -17,9 +19,11 @@ import java.util.HashMap;
 public class StatusModule extends ReactContextBaseJavaModule {
 
   BatteryManager battery = null;
+  ReactApplicationContext reactContext = null;
 
   public StatusModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    this.reactContext = reactContext;
     this.battery = (BatteryManager)reactContext.getSystemService(reactContext.BATTERY_SERVICE);
   }
 
@@ -52,7 +56,12 @@ public class StatusModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void batteryIsCharging(Promise promisse) {
     try {
-      promisse.resolve(this.battery.isCharging());
+      IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+      Intent batteryStatus = this.reactContext.getApplicationContext().registerReceiver(null, ifilter);
+      int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+      boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING;
+
+      promisse.resolve(isCharging);
     }
     catch(Exception e) { // Any exception causes a rejection of the promisse
       promisse.reject("ERROR", e.getMessage(), e);
