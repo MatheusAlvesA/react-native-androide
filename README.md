@@ -1,4 +1,4 @@
-# react-native-android
+# react-native-androide
 
 This library is under development, this means that it can not be used in production environment yet
 
