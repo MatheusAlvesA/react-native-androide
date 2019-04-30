@@ -1,20 +1,20 @@
 {
   "name": "react-native-androide",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A fully library to integrate react applications with Android native API",
   "main": "index.js",
   "author": "Matheus Alves de Andrade",
   "license": "MIT",
-  "homepage": "https://github.com/MatheusAlvesA/react-native-android",
+  "homepage": "https://github.com/MatheusAlvesA/react-native-androide",
   "bugs": {
-      "url": "https://github.com/MatheusAlvesA/react-native-android/issues"
+      "url": "https://github.com/MatheusAlvesA/react-native-androide/issues"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MatheusAlvesA/react-native-android.git"
+    "url": "https://github.com/MatheusAlvesA/react-native-androide.git"
   },
   "keywords": [
     "react-native",
