@@ -1,6 +1,9 @@
 # react-native-androide
 
-This library is under development, this means that it can not be used in production environment yet
+React Native is a amazing framework to create UI, but does not have too much functions likes java applications made to Android do.
+This library is designed to Android developers, and have several functions and components that allows best integrations with Android system.
+
+Full documentation can be found in https://github.com/MatheusAlvesA/react-native-androide/wiki
 
 ## Getting started
 
@@ -26,14 +29,4 @@ This library is under development, this means that it can not be used in product
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```
       compile project(':react-native-androide')
-  	```
-
-
-## Usage
-```javascript
-import RNAndroid from 'react-native-androide';
-
-// TODO
-RNAndroid;
-```
-  
+  	```  
