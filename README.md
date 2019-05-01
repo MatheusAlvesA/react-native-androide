@@ -1,7 +1,7 @@
 # react-native-androide
 
 React Native is a amazing framework to create UI, but does not have too much functions likes java applications made to Android do.
-This library is designed to Android developers, and have several functions and components that allows best integrations with Android system.
+This library is designed to Android developers, and has several functions and components that allow better integrations with the Android system.
 
 Full documentation can be found in https://github.com/MatheusAlvesA/react-native-androide/wiki
 
