@@ -107,6 +107,33 @@ public class StatusModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  private void getCurrentLanguage(Promise promisse) {
+    Locale current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      promisse.resolve( current.toLanguageTag() );
+    } else {
+      StringBuilder builder = new StringBuilder();
+      builder.append(current.getLanguage());
+      if (current.getCountry() != null) {
+        builder.append("-");
+        builder.append(current.getCountry());
+      }
+      promisse.resolve( builder.toString() );
+    }
+  }
+
+  @ReactMethod
+  public void getFreeDiskStorage(Promise promisse) {
+    try {
+      StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+      promisse.resolve( BigInteger.valueOf(external.getAvailableBytes()).intValue() );
+    } catch (Exception e) {
+      promisse.reject(e);
+    }
+  }
+
+  @ReactMethod
   public void isWifiConnected(Promise promisse) {
       try {
         promisse.resolve( this.isWifiConnected() );
@@ -120,16 +147,6 @@ public class StatusModule extends ReactContextBaseJavaModule {
     try {
       WifiManager wifiMgr = this.getWifiManager();
       promisse.resolve( wifiMgr.isWifiEnabled() );
-    } catch (Exception e) {
-      promisse.reject(e);
-    }
-  }
-
-  @ReactMethod
-  public void getFreeDiskStorage(Promise promisse) {
-    try {
-      StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-      promisse.resolve( BigInteger.valueOf(external.getAvailableBytes()).intValue() );
     } catch (Exception e) {
       promisse.reject(e);
     }
@@ -156,23 +173,6 @@ public class StatusModule extends ReactContextBaseJavaModule {
       promisse.resolve(ipStr);
     } catch(Exception e) {
       promisse.reject(e);
-    }
-  }
-
-  @ReactMethod
-  private void getCurrentLanguage(Promise promisse) {
-    Locale current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      promisse.resolve( current.toLanguageTag() );
-    } else {
-      StringBuilder builder = new StringBuilder();
-      builder.append(current.getLanguage());
-      if (current.getCountry() != null) {
-        builder.append("-");
-        builder.append(current.getCountry());
-      }
-      promisse.resolve( builder.toString() );
     }
   }
 
