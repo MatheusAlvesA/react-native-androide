@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.text.format.Formatter;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.content.pm.PackageManager;
@@ -23,8 +22,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Collections;
 import java.net.NetworkInterface;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.math.BigInteger;
 
 
@@ -140,8 +137,12 @@ public class StatusModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getIpAddress(Promise promisse) {
-    if(!this.isWifiConnected()) {
-      promisse.reject("WIFI_DISCONNECTED", "The WiFi adapter are not connected in any access point");
+    try {
+      if(!this.isWifiConnected()) {
+        promisse.reject("WIFI_DISCONNECTED", "The WiFi adapter are not connected in any access point");
+      }
+    } catch (Exception e) {
+      promisse.reject(e);
     }
 
     try {
@@ -220,14 +221,14 @@ public class StatusModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getBatteryLevel(Promise promisse) {
-  	try {
-  		promisse.resolve(
-          this.battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    try {
+      promisse.resolve(
+        this.battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
       );
-  	}
+    }
     catch(Exception e) { // Any exception causes a rejection of the promisse
-  		promisse.reject(e);
-  	}
+      promisse.reject(e);
+    }
   }
 
   @ReactMethod
