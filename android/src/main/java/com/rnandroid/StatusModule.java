@@ -25,9 +25,6 @@ import java.net.NetworkInterface;
 import java.math.BigInteger;
 
 
-/*
-  This Class requires Android API >=23
-*/
 public class StatusModule extends ReactContextBaseJavaModule {
 
   BatteryManager battery = null;
@@ -70,9 +67,19 @@ public class StatusModule extends ReactContextBaseJavaModule {
         || "google_sdk".equals(Build.PRODUCT);
   }
 
+  // Using deprecated getConfiguration().locale only if the api leve of device is old
+  @SuppressWarnings("deprecation")
   private String getCurrentCountry() {
-    Locale current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
-    return current.getCountry();
+	Locale current;
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+    //requires api level 24
+		current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
+	} else {
+    // Deprecated in api level 24
+		current = getReactApplicationContext().getResources().getConfiguration().locale;
+	}
+
+	  return current.getCountry();
   }
 
   /*
@@ -106,9 +113,18 @@ public class StatusModule extends ReactContextBaseJavaModule {
       }
   }
 
+  // Using deprecated getConfiguration().locale only if the api leve of device is old
+  @SuppressWarnings("deprecation")
   @ReactMethod
   private void getCurrentLanguage(Promise promisse) {
-    Locale current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
+  	Locale current;
+  	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      // requires api level 24
+  		current = getReactApplicationContext().getResources().getConfiguration().getLocales().get(0);
+  	} else {
+      // Deprecated in api level 24
+  		current = getReactApplicationContext().getResources().getConfiguration().locale;
+  	}
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       promisse.resolve( current.toLanguageTag() );
@@ -120,14 +136,14 @@ public class StatusModule extends ReactContextBaseJavaModule {
         builder.append(current.getCountry());
       }
       promisse.resolve( builder.toString() );
-    }
+	  }
   }
 
   @ReactMethod
   public void getFreeDiskStorage(Promise promisse) {
     try {
       StatFs external = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
-      promisse.resolve( BigInteger.valueOf(external.getAvailableBytes()).intValue() );
+      promisse.resolve( BigInteger.valueOf(external.getAvailableBytes()).toString() );
     } catch (Exception e) {
       promisse.reject(e);
     }
@@ -221,10 +237,13 @@ public class StatusModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getBatteryLevel(Promise promisse) {
-    try {
-      promisse.resolve(
-        this.battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-      );
+	try {
+		Intent batteryIntent = this.reactContext.getApplicationContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+		float batteryLevel = level / (float) scale;
+
+		promisse.resolve(Math.round(batteryLevel*100));
     }
     catch(Exception e) { // Any exception causes a rejection of the promisse
       promisse.reject(e);
