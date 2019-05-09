@@ -9,12 +9,9 @@ import com.facebook.react.bridge.Promise;
 
 public class SoundModule extends ReactContextBaseJavaModule {
 
-  Vibrator vibrator;
-
-  public VibratorModule(ReactApplicationContext reactContext) {
+  public SoundModule(ReactApplicationContext reactContext) {
     super(reactContext);
-
-    this.vibrator = (Vibrator) reactContext.getSystemService(reactContext.VIBRATOR_SERVICE);
+    // TODO
   }
 
   @Override
