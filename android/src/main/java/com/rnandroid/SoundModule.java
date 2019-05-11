@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.content.res.AssetFileDescriptor;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -34,10 +35,9 @@ public class SoundModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void prepare(String source, Promise p) {
+  public void prepare(String source, final Promise p) {
     try {
-      this.prepareMediaPlayer(source);
-      p.resolve(true);
+      this.prepareMediaPlayer(source, p);
     } catch (IOException e) {
       p.reject(e);
     }
@@ -178,6 +178,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void seekTo(String msec, Promise p) {
+    if (Build.VERSION.SDK_INT < 26) // seekTo does not exists in api level <26
+      p.reject("ERROR", "Minimum API level 26 required to this function");
     if(this.mediaPlayer == null) {
       p.reject("ERROR", "Media Player is not prepareted");
       return;
@@ -206,7 +208,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
     .emit("soundFinishedPlay", null);
   }
 
-  private void prepareMediaPlayer(String source) throws IOException {
+  private void prepareMediaPlayer(String source, final Promise p) throws IOException {
     if(this.mediaPlayer != null) {
       this.mediaPlayer.release();
       this.mediaPlayer = null;
@@ -226,7 +228,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
                                   afd.getStartOffset(),
                                   afd.getLength()
                                 );
-        this.mediaPlayer.prepare();
+        this.mediaPlayer.prepareAsync();
       }
     }
 
@@ -236,10 +238,11 @@ public class SoundModule extends ReactContextBaseJavaModule {
         source.startsWith("https://")
       )) {
       Uri uri = Uri.parse(source);
-      this.mediaPlayer = MediaPlayer.create(this.context, uri);
+      this.mediaPlayer = new MediaPlayer();
+      this.mediaPlayer.setDataSource(this.context, uri);
       if(this.mediaPlayer == null)
         throw new IOException("Failed to open uri: ".concat(source));
-      this.mediaPlayer.prepare();
+      this.mediaPlayer.prepareAsync();
     }
 
     // It's from the file system
@@ -248,7 +251,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
         && file.exists()          // It's from the file system
     ) {
       this.mediaPlayer.setDataSource(source);
-      this.mediaPlayer.prepare();
+      this.mediaPlayer.prepareAsync();
     }
 
     if(this.mediaPlayer != null) { // Player is ready now
@@ -257,6 +260,13 @@ public class SoundModule extends ReactContextBaseJavaModule {
         @Override
         public synchronized void onCompletion(MediaPlayer mp) {
           onCompleted();
+        }
+      });
+
+      this.mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        @Override
+        public synchronized void onPrepared(MediaPlayer mp) {
+          p.resolve(true); // Audio loaded an ready
         }
       });
 
