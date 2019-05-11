@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.net.Uri;
 import android.media.AudioManager;
+import android.media.AudioFocusRequest;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -135,6 +136,23 @@ public class SoundModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void getAudioFocus(Promise p) {
+    if (Build.VERSION.SDK_INT < 26) {
+        p.reject("ERROR", "Minimum API level 26 required to this function");
+        return;
+    }
+
+    AudioManager am = (AudioManager) this.context.getSystemService(this.context.AUDIO_SERVICE);
+    try {
+      AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).build();
+      am.requestAudioFocus(focusRequest);
+      p.resolve(true);
+    } catch (SecurityException e) {
+      p.reject(e);
+    }
+  }
+
+  @ReactMethod
   public void getSystemVolume(Promise p) {
     AudioManager am = (AudioManager) this.context.getSystemService(this.context.AUDIO_SERVICE);
     p.resolve(
@@ -179,8 +197,10 @@ public class SoundModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void seekTo(String msec, Promise p) {
-    if (Build.VERSION.SDK_INT < 26) // seekTo does not exists in api level <26
+    if (Build.VERSION.SDK_INT < 26) { // seekTo does not exists in api level <26
       p.reject("ERROR", "Minimum API level 26 required to this function");
+      return;
+    }
     if(this.mediaPlayer == null) {
       p.reject("ERROR", "Media Player is not prepareted");
       return;
@@ -246,9 +266,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer.prepareAsync();
     }
 
-    // It's from the file system
-    String dl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-    File file = new File(dl+"/"+source);
+    File file = new File(source);
     if (this.mediaPlayer == null  // Player is not ready yet
         && file.exists()          // It's from the file system
     ) {
