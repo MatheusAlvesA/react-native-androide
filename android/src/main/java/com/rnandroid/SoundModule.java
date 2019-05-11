@@ -100,7 +100,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     try {
-      p.resolve(this.mediaPlayer.getCurrentPosition().toString());
+      int returned = this.mediaPlayer.getCurrentPosition();
+      p.resolve(Integer.toString(returned));
     } catch (IllegalStateException e) {
       this.mediaPlayer.release();
       this.mediaPlayer = null;
@@ -116,7 +117,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     try {
-      p.resolve(this.mediaPlayer.getDuration().toString());
+      int returned = this.mediaPlayer.getDuration();
+      p.resolve(Integer.toString(returned));
     } catch (IllegalStateException e) {
       this.mediaPlayer.release();
       this.mediaPlayer = null;
@@ -131,11 +133,11 @@ public class SoundModule extends ReactContextBaseJavaModule {
       return;
     }
 
-    Long lmsec = 0;
+    long lmsec = (long) 0;
     try {
-      lmsec = Long.parseLong(msec)
+      lmsec = Long.parseLong(msec);
     } catch (NumberFormatException e) {
-      e.reject(e);
+      p.reject(e);
     }
 
     try {
