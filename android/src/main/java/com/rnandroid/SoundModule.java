@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import android.net.Uri;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.content.res.AssetFileDescriptor;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -12,6 +13,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 
 public class SoundModule extends ReactContextBaseJavaModule {
@@ -150,9 +152,17 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
   }
 
+  private void onCompleted() {
+    this.context
+    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+    .emit("soundFinishedPlay", null);
+  }
+
   private void prepareMediaPlayer(String source) throws IOException {
-    if(this.mediaPlayer != null)
+    if(this.mediaPlayer != null) {
       this.mediaPlayer.release();
+      this.mediaPlayer = null;
+    }
 
     int res = this.context.getResources()
                           .getIdentifier(
@@ -170,11 +180,13 @@ public class SoundModule extends ReactContextBaseJavaModule {
                                 );
         this.mediaPlayer.prepare();
       }
-      return;
     }
 
     // It's from the Internet
-    if(source.startsWith("http://") || source.startsWith("https://")) {
+    if(this.mediaPlayer == null && ( // Player is not ready yet
+        source.startsWith("http://") ||
+        source.startsWith("https://")
+      )) {
       Uri uri = Uri.parse(source);
       this.mediaPlayer = MediaPlayer.create(this.context, uri);
       if(this.mediaPlayer == null)
@@ -182,15 +194,27 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer.prepare();
     }
 
+    // It's from the file system
     File file = new File(source);
-    if (file.exists()) { // It's from the file system
+    if (this.mediaPlayer == null  // Player is not ready yet
+        && file.exists()          // It's from the file system
+    ) {
       this.mediaPlayer.setDataSource(source);
       this.mediaPlayer.prepare();
-      return;
     }
 
-    // Is undetermined
-    throw new IOException("Failed to open uri: ".concat(source));
+    if(this.mediaPlayer != null) { // Player is ready now
+
+      this.mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+        @Override
+        public synchronized void onCompletion(MediaPlayer mp) {
+          onCompleted();
+        }
+      });
+
+    } else { // This audio source is undetermined
+      throw new IOException("Failed to open uri: ".concat(source));
+    }
   }
 
   private String removeFileExtension(String source) {

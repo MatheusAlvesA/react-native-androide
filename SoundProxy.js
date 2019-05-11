@@ -1,11 +1,14 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, DeviceEventEmitter } from 'react-native';
 
 const { Sound } = NativeModules;
 
 let SoundProxy = {
 	...Sound,
-	seekTo: async function(souce) {
-		return await Sound.seekTo(souce.toString());
+  setOnCompletionListener: function(cb) {
+    return DeviceEventEmitter.addListener('soundFinishedPlay', cb);
+	},
+	seekTo: async function(where) {
+		return await Sound.seekTo(where.toString());
 	},
   getDuration: async function() {
 		return Number(await Sound.getDuration());
