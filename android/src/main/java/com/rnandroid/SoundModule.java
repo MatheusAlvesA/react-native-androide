@@ -34,7 +34,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
     try {
       this.prepareMediaPlayer(source);
       p.resolve(true);
-    } catch (Exception e) {
+    } catch (IOException e) {
       p.reject(e);
     }
   }
@@ -54,14 +54,45 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
   }
 
-  private void prepareMediaPlayer(String fileName) throws IOException {
-    fileName = this.removeFileExtension(fileName);
+  @ReactMethod
+  public void stop(Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    try {
+      this.mediaPlayer.stop();
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
+      p.resolve(true);
+    } catch (IllegalStateException e) {
+      p.reject(e);
+    }
+  }
+
+  @ReactMethod
+  public void pause(Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    try {
+      this.mediaPlayer.pause();
+      p.resolve(true);
+    } catch (IllegalStateException e) {
+      p.reject(e);
+    }
+  }
+
+  private void prepareMediaPlayer(String source) throws IOException {
     if(this.mediaPlayer != null)
       this.mediaPlayer.release();
 
     int res = this.context.getResources()
                           .getIdentifier(
-                                          fileName,
+                                          this.removeFileExtension(source);,
                                           "raw",
                                           this.context.getPackageName()
                                         );
@@ -79,23 +110,23 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     // It's from the Internet
-    if(fileName.startsWith("http://") || fileName.startsWith("https://")) {
-      Uri uri = Uri.parse(fileName);
+    if(source.startsWith("http://") || source.startsWith("https://")) {
+      Uri uri = Uri.parse(source);
       this.mediaPlayer = MediaPlayer.create(this.context, uri);
       if(this.mediaPlayer == null)
-        throw new IOException("Failed to open uri: ".concat(fileName));
+        throw new IOException("Failed to open uri: ".concat(source));
       this.mediaPlayer.prepare();
     }
 
-    File file = new File(fileName);
+    File file = new File(source);
     if (file.exists()) { // It's from the file system
-      this.mediaPlayer.setDataSource(fileName);
+      this.mediaPlayer.setDataSource(source);
       this.mediaPlayer.prepare();
       return;
     }
 
     // Is undetermined
-    throw new IOException("Failed to open uri: ".concat(fileName));
+    throw new IOException("Failed to open uri: ".concat(source));
   }
 
   private String removeFileExtension(String source) {
