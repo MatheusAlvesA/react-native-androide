@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import android.os.Build;
+import android.os.Environment;
 import android.net.Uri;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -246,11 +247,13 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     // It's from the file system
-    File file = new File(source);
+    String dl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+    File file = new File(dl+"/"+source);
     if (this.mediaPlayer == null  // Player is not ready yet
         && file.exists()          // It's from the file system
     ) {
-      this.mediaPlayer.setDataSource(source);
+      this.mediaPlayer = new MediaPlayer();
+      this.mediaPlayer.setDataSource(file.getAbsolutePath());
       this.mediaPlayer.prepareAsync();
     }
 

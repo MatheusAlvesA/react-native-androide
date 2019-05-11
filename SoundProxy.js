@@ -1,4 +1,4 @@
-import { NativeModules, DeviceEventEmitter } from 'react-native';
+import { NativeModules, DeviceEventEmitter, PermissionsAndroid } from 'react-native';
 
 const { Sound } = NativeModules;
 
@@ -20,6 +20,21 @@ let SoundProxy = {
 		await Sound.prepare(name);
 		await Sound.play();
 		return true;
+	},
+	requestPermission: async function() {
+			const granted = await PermissionsAndroid.request(
+			  PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+			  {
+				'title': 'Play Sound',
+				'message': 'This application requires access to the file system to play songs'
+			  }
+			);
+
+			if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+				return true;
+			} else {
+				return false;
+			}
 	}
 };
 
