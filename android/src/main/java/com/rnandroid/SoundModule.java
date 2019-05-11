@@ -3,7 +3,9 @@ package com.rnandroid;
 import java.io.File;
 import java.io.IOException;
 
+import android.os.Build;
 import android.net.Uri;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.content.res.AssetFileDescriptor;
@@ -109,6 +111,35 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer = null;
       p.reject(e);
     }
+  }
+
+  @ReactMethod
+  public void setSystemVolume(float value, Promise p) {
+    AudioManager am = (AudioManager) this.context.getSystemService(this.context.AUDIO_SERVICE);
+    int volume = Math.round(am.getStreamMaxVolume(AudioManager.STREAM_MUSIC) * value);
+
+    try {
+      // This function can throw a exception if "Do Not Disturb" is activated
+      am.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+    } catch (SecurityException e) {
+      p.reject(e);
+    }
+
+    if (Build.VERSION.SDK_INT < 21) { // isVolumeFixed does not exists yet
+      p.resolve(true);
+    } else {
+      p.resolve(!am.isVolumeFixed());
+    }
+
+  }
+
+  @ReactMethod
+  public void getSystemVolume(Promise p) {
+    AudioManager am = (AudioManager) this.context.getSystemService(this.context.AUDIO_SERVICE);
+    p.resolve(
+      (float) am.getStreamVolume(AudioManager.STREAM_MUSIC) /
+              am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+    );
   }
 
   @ReactMethod
