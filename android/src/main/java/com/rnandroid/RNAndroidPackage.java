@@ -18,6 +18,7 @@ public class RNAndroidPackage implements ReactPackage {
 	    modules.add(new ToastModule(reactContext));
 	    modules.add(new StatusModule(reactContext));
       modules.add(new VibratorModule(reactContext));
+      modules.add(new SoundModule(reactContext));
 
       return modules;
     }
