@@ -86,13 +86,41 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
   }
 
+  @ReactMethod
+  public void getCurrentPosition(Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    try {
+      p.resolve(this.mediaPlayer.getCurrentPosition());
+    } catch (IllegalStateException e) {
+      p.reject(e);
+    }
+  }
+
+  @ReactMethod
+  public void getDuration(Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    try {
+      p.resolve(this.mediaPlayer.getDuration());
+    } catch (IllegalStateException e) {
+      p.reject(e);
+    }
+  }
+
   private void prepareMediaPlayer(String source) throws IOException {
     if(this.mediaPlayer != null)
       this.mediaPlayer.release();
 
     int res = this.context.getResources()
                           .getIdentifier(
-                                          this.removeFileExtension(source);,
+                                          this.removeFileExtension(source),
                                           "raw",
                                           this.context.getPackageName()
                                         );
