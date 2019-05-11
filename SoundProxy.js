@@ -15,6 +15,11 @@ let SoundProxy = {
 	},
   getCurrentPosition: async function() {
 		return Number(await Sound.getCurrentPosition());
+	},
+	playNow: async function(name) {
+		await Sound.prepare(name);
+		await Sound.play();
+		return true;
 	}
 };
 

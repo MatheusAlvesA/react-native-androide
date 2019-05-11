@@ -95,6 +95,23 @@ public class SoundModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void setVolume(float left, float right, Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    try {
+      this.mediaPlayer.setVolume(left, right);
+      p.resolve(true);
+    } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
+      p.reject(e);
+    }
+  }
+
+  @ReactMethod
   public void getCurrentPosition(Promise p) {
     if(this.mediaPlayer == null) {
       p.reject("ERROR", "Media Player is not prepareted");
