@@ -50,6 +50,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer.start();
       p.resolve(true);
     } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
       p.reject(e);
     }
   }
@@ -67,6 +69,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer = null;
       p.resolve(true);
     } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
       p.reject(e);
     }
   }
@@ -82,6 +86,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
       this.mediaPlayer.pause();
       p.resolve(true);
     } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
       p.reject(e);
     }
   }
@@ -96,6 +102,8 @@ public class SoundModule extends ReactContextBaseJavaModule {
     try {
       p.resolve(this.mediaPlayer.getCurrentPosition());
     } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
       p.reject(e);
     }
   }
@@ -110,6 +118,32 @@ public class SoundModule extends ReactContextBaseJavaModule {
     try {
       p.resolve(this.mediaPlayer.getDuration());
     } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
+      p.reject(e);
+    }
+  }
+
+  @ReactMethod
+  public void seekTo(String msec, Promise p) {
+    if(this.mediaPlayer == null) {
+      p.reject("ERROR", "Media Player is not prepareted");
+      return;
+    }
+
+    Long lmsec = 0;
+    try {
+      lmsec = Long.parseLong(msec)
+    } catch (NumberFormatException e) {
+      e.reject(e);
+    }
+
+    try {
+      this.mediaPlayer.seekTo(lmsec, MediaPlayer.SEEK_PREVIOUS_SYNC);
+      p.resolve(true);
+    } catch (IllegalStateException e) {
+      this.mediaPlayer.release();
+      this.mediaPlayer = null;
       p.reject(e);
     }
   }
