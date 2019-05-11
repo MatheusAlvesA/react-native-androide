@@ -100,7 +100,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     try {
-      p.resolve(this.mediaPlayer.getCurrentPosition());
+      p.resolve(this.mediaPlayer.getCurrentPosition().toString());
     } catch (IllegalStateException e) {
       this.mediaPlayer.release();
       this.mediaPlayer = null;
@@ -116,7 +116,7 @@ public class SoundModule extends ReactContextBaseJavaModule {
     }
 
     try {
-      p.resolve(this.mediaPlayer.getDuration());
+      p.resolve(this.mediaPlayer.getDuration().toString());
     } catch (IllegalStateException e) {
       this.mediaPlayer.release();
       this.mediaPlayer = null;
