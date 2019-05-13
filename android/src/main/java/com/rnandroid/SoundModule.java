@@ -197,24 +197,20 @@ public class SoundModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void seekTo(String msec, Promise p) {
-    if (Build.VERSION.SDK_INT < 26) { // seekTo does not exists in api level <26
-      p.reject("ERROR", "Minimum API level 26 required to this function");
-      return;
-    }
     if(this.mediaPlayer == null) {
       p.reject("ERROR", "Media Player is not prepareted");
       return;
     }
 
-    long lmsec = (long) 0;
+    int lmsec = 0;
     try {
-      lmsec = Long.parseLong(msec);
+      lmsec = Integer.parseInt(msec);
     } catch (NumberFormatException e) {
       p.reject(e);
     }
 
     try {
-      this.mediaPlayer.seekTo(lmsec, MediaPlayer.SEEK_PREVIOUS_SYNC);
+      this.mediaPlayer.seekTo(lmsec);
       p.resolve(true);
     } catch (IllegalStateException e) {
       this.mediaPlayer.release();
