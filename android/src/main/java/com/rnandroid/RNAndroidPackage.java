@@ -20,6 +20,7 @@ public class RNAndroidPackage implements ReactPackage {
       modules.add(new VibratorModule(reactContext));
       modules.add(new SoundModule(reactContext));
       modules.add(new KeepAwake(reactContext));
+      modules.add(new FileSystem(reactContext));
 
       return modules;
     }
