@@ -133,7 +133,7 @@ public class FileSystem extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void write(String path, String data, Promise p) {
+  public void write(String path, String data, Boolean append, Promise p) {
     try {
       File f = new File(path);
       if(!f.exists()) {
@@ -141,7 +141,7 @@ public class FileSystem extends ReactContextBaseJavaModule {
         return;
       }
 
-      FileOutputStream out = new FileOutputStream(f);
+      FileOutputStream out = new FileOutputStream(f, append);
       out.write(Base64.decode(data, Base64.DEFAULT));
       out.close();
 
