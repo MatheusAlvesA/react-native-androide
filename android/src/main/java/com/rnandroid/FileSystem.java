@@ -152,6 +152,35 @@ public class FileSystem extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
+  public void rename(String path, String newName, Promise p) {
+    File originalFile = new File(path);
+    if(!originalFile.exists()) {
+       p.reject("ERROR", "The file does not exists");
+       return;
+    }
+
+    String parentPath = originalFile.getAbsolutePath();
+    String[] partsOfParentPath = parentPath.split(File.separator);
+    String fullPathName = "";
+    for(int i = 0; i < partsOfParentPath.length-1; i++)
+      fullPathName += File.separator+partsOfParentPath[i];
+    File renamedFile = new File( fullPathName+File.separator+newName );
+
+    if(renamedFile.exists()) {
+       p.reject("ERROR", "The file "+newName+" already exists");
+       return;
+    }
+
+    boolean success = originalFile.renameTo(renamedFile);
+    if (!success) {
+      p.reject("ERROR", "Unknown error when renaming the file");
+      return;
+    }
+
+    p.resolve(renamedFile.getAbsolutePath());
+  }
+
+  @ReactMethod
   public void base64Decode(String data, Promise p) {
     try {
       p.resolve( new String(Base64.decode(data, Base64.DEFAULT)) );
