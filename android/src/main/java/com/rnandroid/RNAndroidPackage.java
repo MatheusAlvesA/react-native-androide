@@ -21,6 +21,7 @@ public class RNAndroidPackage implements ReactPackage {
       modules.add(new SoundModule(reactContext));
       modules.add(new KeepAwake(reactContext));
       modules.add(new FileSystem(reactContext));
+      modules.add(new Downloader(reactContext));
 
       return modules;
     }
