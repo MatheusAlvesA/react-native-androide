@@ -61,6 +61,24 @@ public class Downloader extends ReactContextBaseJavaModule {
     this.watchDownload(id);
   }
 
+  @ReactMethod
+  public void cancel(String idString, Promise p) {
+    long id = (long)0;
+    try {
+      id = Long.valueOf(idString);
+    } catch(NumberFormatException e) {
+      p.reject(e);
+      return;
+    }
+
+    int n = this.dm.remove(id);
+    if(n == 0) {
+      p.resolve(false);
+    } else {
+      p.resolve(true);
+    }
+  }
+
   private void watchDownload(final Long id) {
     final Downloader that = this;
 
