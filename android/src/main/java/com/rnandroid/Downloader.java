@@ -2,6 +2,7 @@ package com.rnandroid;
 
 import android.app.DownloadManager;
 import android.net.Uri;
+import android.database.Cursor;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -10,9 +11,11 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
+import com.facebook.react.bridge.WritableNativeMap;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.io.File;
 
 public class Downloader extends ReactContextBaseJavaModule {
 
@@ -85,7 +88,7 @@ public class Downloader extends ReactContextBaseJavaModule {
     }
 
     req.setAllowedOverMetered(true); // Set if download is allowed on Mobile network
-    req.setAllowedOverRoaming(true);// Set if download is allowed on roaming network
+    req.setAllowedOverRoaming(true); // Set if download is allowed on roaming network
   }
 
   private void setHeaders(ReadableMap headers, DownloadManager.Request req) {
@@ -97,5 +100,66 @@ public class Downloader extends ReactContextBaseJavaModule {
         req.addRequestHeader(key, value);
       }
     }
+  }
+
+  private WritableNativeMap getDownloadMetadata(Long id) {
+    DownloadManager.Query q = new DownloadManager.Query();
+    q.setFilterById(id);
+    Cursor cur = this.dm.query(q);
+    cur.moveToFirst();
+
+    WritableNativeMap wm = new WritableNativeMap();
+    if(cur.getCount() > 0) {
+      wm.putDouble("progress", this.getDownloadProgress(cur));
+      wm.putBoolean("finished", this.isDownloadFinished(cur));
+      wm.putBoolean("error", this.isDownloadFailed(cur));
+      wm.putString("filePath", this.getDownloadFilePath(cur));
+    } else { // Empty Cursor, perhaps download is calceled
+      wm.putDouble("progress", 0.0);
+      wm.putBoolean("finished", true);
+      wm.putBoolean("error", true);
+      wm.putString("filePath", null);
+    }
+
+    return wm;
+  }
+
+  private double getDownloadProgress(Cursor cursor) {
+    int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+    int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+    double progress = 0;
+    if(bytes_total > 0) {
+      progress = ((double) bytes_downloaded) / bytes_total;
+    }
+    return progress;
+  }
+
+  private boolean isDownloadFinished(Cursor cursor) {
+    int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+    if(status == DownloadManager.STATUS_PAUSED ||
+      status == DownloadManager.STATUS_PENDING ||
+      status == DownloadManager.STATUS_RUNNING
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  private boolean isDownloadFailed(Cursor cursor) {
+    int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+    if(status == DownloadManager.STATUS_FAILED) {
+      return true;
+    }
+    return false;
+  }
+
+  private String getDownloadFilePath(Cursor cursor) {
+    String downloadFilePath = null;
+    String downloadFileLocalUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+    if (downloadFileLocalUri != null) {
+        File mFile = new File(Uri.parse(downloadFileLocalUri).getPath());
+        downloadFilePath = mFile.getAbsolutePath();
+    }
+    return downloadFilePath;
   }
 }
