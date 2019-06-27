@@ -12,6 +12,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -20,24 +21,17 @@ import java.io.File;
 public class Downloader extends ReactContextBaseJavaModule {
 
   DownloadManager dm;
+  ReactApplicationContext context;
 
   public Downloader(ReactApplicationContext reactContext) {
     super(reactContext);
+    this.context = reactContext;
     this.dm = (DownloadManager) reactContext.getSystemService(reactContext.DOWNLOAD_SERVICE);
   }
 
   @Override
   public String getName() {
     return "Downloader";
-  }
-
-  @Override
-  public Map<String, Object> getConstants() {
-    final Map<String, Object> constants = new HashMap<>();
-
-    constants.put("ok", this.dm != null);
-
-    return constants;
   }
 
   @ReactMethod
@@ -62,7 +56,33 @@ public class Downloader extends ReactContextBaseJavaModule {
       return;
     }
 
-    p.resolve( String.valueOf(this.dm.enqueue(req)) );
+    Long id = this.dm.enqueue(req);
+    p.resolve( String.valueOf(id) );
+    this.watchDownload(id);
+  }
+
+  private void watchDownload(final Long id) {
+    final Downloader that = this;
+
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+          boolean downloading = true;
+          while(downloading) {
+            WritableNativeMap wm = that.getDownloadMetadata(id);
+            downloading = !wm.getBoolean("finished");
+            that.context
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit("downloadProgress", wm);
+
+            try {
+              Thread.currentThread().sleep(1000);
+            } catch(InterruptedException e) {
+              /* Empty */
+            }
+          }
+      }
+    }).start();
   }
 
   private void setConfiguration(ReadableMap config, DownloadManager.Request req) {
@@ -110,11 +130,13 @@ public class Downloader extends ReactContextBaseJavaModule {
 
     WritableNativeMap wm = new WritableNativeMap();
     if(cur.getCount() > 0) {
+      wm.putString("id", String.valueOf(id));
       wm.putDouble("progress", this.getDownloadProgress(cur));
       wm.putBoolean("finished", this.isDownloadFinished(cur));
       wm.putBoolean("error", this.isDownloadFailed(cur));
       wm.putString("filePath", this.getDownloadFilePath(cur));
     } else { // Empty Cursor, perhaps download is calceled
+      wm.putString("id", String.valueOf(id));
       wm.putDouble("progress", 0.0);
       wm.putBoolean("finished", true);
       wm.putBoolean("error", true);
