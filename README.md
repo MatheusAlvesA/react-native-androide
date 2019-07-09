@@ -16,6 +16,8 @@ Full documentation can be found in https://github.com/MatheusAlvesA/react-native
 
 ### Mostly automatic installation (Recommended)
 
+> If you are using React Native >= v0.60.0, the linking steps are not required.
+
 `$ react-native link react-native-androide`
 
 ### Manual installation
