@@ -1,10 +1,10 @@
 import { NativeModules } from 'react-native';
-import AndroidSystemStatusProxy from './AndroidSystemStatusProxy.js';
-import VibratorProxy from './VibratorProxy.js';
-import SoundProxy from './SoundProxy.js';
-import DownloaderProxy from './DownloaderProxy.js';
-import FileSystemProxy from './FileSystemProxy.js';
-import VideoContainer from './VideoProxy.js';
+import AndroidSystemStatusProxy from './Proxys/AndroidSystemStatusProxy.js';
+import VibratorProxy from './Proxys/VibratorProxy.js';
+import SoundProxy from './Proxys/SoundProxy.js';
+import DownloaderProxy from './Proxys/DownloaderProxy.js';
+import FileSystemProxy from './Proxys/FileSystemProxy.js';
+import VideoContainer from './Proxys/VideoProxy.js';
 
 
 const { AndroidToast, KeepAwake, VideoViewManager } = NativeModules;
