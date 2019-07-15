@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { ProgressBarAndroid, requireNativeComponent, View, Text } from 'react-native';
+import { ProgressBarAndroid, requireNativeComponent,
+         View, Image } from 'react-native';
 
 const VideoView = requireNativeComponent('VideoViewManager');
 
@@ -35,7 +36,11 @@ function VideoContainer(props) {
           paddingRight: 5,
         }}
       >
-        <Text>{'>'}</Text>
+        <Image
+          style={{width: '10%', height: 30}}
+          source={require('../res/imgs/pause_icon.png')}
+          resizeMode='center'
+        />
         <ProgressBarAndroid
           style={{
             width: '90%',
