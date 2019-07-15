@@ -55,6 +55,14 @@ public class VideoViewManager extends SimpleViewManager<VideoView> {
     }
   }
 
+  @ReactProp(name="progress")
+  public void setVideoProgress(VideoView videoView, double percent) {
+    if(percent > 1.0 || percent < 0.0) {
+      return;
+    }
+    videoView.seekTo((int) (percent * videoView.getDuration()));
+  }
+
   @ReactProp(name="id")
   public void setVideoId(final VideoView videoView, final String id) {
     final ReactContext cx = this.context;

@@ -11,6 +11,7 @@ export default class VideoContainer extends Component {
 
     this.state = {
       progress: 0.0,
+      seekTo: 0.0,
       paused: true
     };
 
@@ -20,6 +21,7 @@ export default class VideoContainer extends Component {
     this.idCBControlsVisible = null;
     this.visibleControls = false;
     this.mounted = false;
+    this.progressBarWidth = 1;
   }
 
   componentDidMount() {
@@ -35,7 +37,11 @@ export default class VideoContainer extends Component {
     if(!this.mounted) return;
 
     if(data.id === this.id) {
-      this.setState({progress: (data.currentPosition / data.duration)})
+      let progress = (data.currentPosition / data.duration);
+      if(progress === 1) {
+        this.reset();
+      }
+      this.setState({progress});
     }
   }
 
@@ -65,7 +71,27 @@ export default class VideoContainer extends Component {
   }
 
   pause = () => {
+    if(!this.visibleControls) {
+      return;
+    }
     this.setState({paused: !this.state.paused});
+  }
+
+  reset = () => {
+    if(!this.paused) {
+      this.setState({paused: !this.state.paused});
+    }
+    this.setState({seekTo: 0.0});
+  }
+
+  seek = evn => {
+    if(!this.visibleControls) {
+      return;
+    }
+    this.setState({
+                    seekTo: ( evn.nativeEvent.locationX /
+                                this.progressBarWidth )
+                  });
   }
 
   render() {
@@ -87,6 +113,7 @@ export default class VideoContainer extends Component {
             url={this.props.url}
             id={this.id}
             paused={this.state.paused}
+            progress={this.state.seekTo}
           />
 
           <View style={{
@@ -117,16 +144,21 @@ export default class VideoContainer extends Component {
                 resizeMode='center'
               />
             </TouchableWithoutFeedback>
-            <ProgressBarAndroid
-              style={{
-                width: '90%',
-                height: 15
-              }}
-              styleAttr="Horizontal"
-              color="white"
-              indeterminate={false}
-              progress={this.state.progress}
-            />
+            <TouchableWithoutFeedback
+              onPress={this.seek}
+            >
+              <ProgressBarAndroid
+                style={{
+                  width: '90%',
+                  height: 15
+                }}
+                styleAttr="Horizontal"
+                color="white"
+                indeterminate={false}
+                progress={this.state.progress}
+                onLayout={evn => this.progressBarWidth = evn.nativeEvent.layout.width}
+              />
+            </TouchableWithoutFeedback>
           </View>
         </View>
       </TouchableWithoutFeedback>
