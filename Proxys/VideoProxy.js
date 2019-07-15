@@ -1,57 +1,138 @@
 import React, { Component } from 'react';
-import { ProgressBarAndroid, requireNativeComponent,
-         View, Image } from 'react-native';
+import { ProgressBarAndroid, requireNativeComponent, DeviceEventEmitter,
+         View, Image, TouchableWithoutFeedback } from 'react-native';
 
 const VideoView = requireNativeComponent('VideoViewManager');
 
-function VideoContainer(props) {
-  const styles = props.style ? props.style : {};
+export default class VideoContainer extends Component {
 
-  return (
-    <View style={{
-      ...styles,
-      overflow: 'hidden'
-    }}>
-      <VideoView style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
-          top: 0,
-          left: 0
-        }}
-        url={props.url}
-      />
+  constructor(props) {
+    super(props);
 
-      <View style={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          height: 50,
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingLeft: 5,
-          paddingRight: 5,
-        }}
+    this.state = {
+      progress: 0.0,
+      paused: true
+    };
+
+    this.styles = props.style ? props.style : {};
+    this.id = this.generateID();
+    this.controlsOnScreenSince = Date.now();
+    this.idCBControlsVisible = null;
+    this.visibleControls = false;
+    this.mounted = false;
+  }
+
+  componentDidMount() {
+    this.mounted = true;
+    DeviceEventEmitter.addListener('RNA_videoProgress', this.progressListener);
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+  }
+
+  progressListener = data => {
+    if(!this.mounted) return;
+
+    if(data.id === this.id) {
+      this.setState({progress: (data.currentPosition / data.duration)})
+    }
+  }
+
+  touched = () => {
+    if(this.visibleControls) {
+
+      this.visibleControls = false;
+      if(this.idCBControlsVisible !== null) {
+        clearTimeout(this.idCBControlsVisible);
+        this.idCBControlsVisible = null;
+      }
+
+    } else {
+
+      this.visibleControls = true;
+      this.idCBControlsVisible = setTimeout(
+        () => {
+          this.visibleControls = false;
+          this.forceUpdate();
+          this.idCBControlsVisible = null;
+        },
+        5000
+      );
+
+    }
+    this.forceUpdate();
+  }
+
+  pause = () => {
+    this.setState({paused: !this.state.paused});
+  }
+
+  render() {
+    return (
+      <TouchableWithoutFeedback
+        onPress={this.touched}
       >
-        <Image
-          style={{width: '10%', height: 30}}
-          source={require('../res/imgs/pause_icon.png')}
-          resizeMode='center'
-        />
-        <ProgressBarAndroid
-          style={{
-            width: '90%',
-            height: 15
-          }}
-          styleAttr="Horizontal"
-          color="white"
-        />
-      </View>
-    </View>
-  );
-}
+        <View style={{
+          ...this.styles,
+          overflow: 'hidden'
+        }}>
+          <VideoView style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0
+            }}
+            url={this.props.url}
+            id={this.id}
+            paused={this.state.paused}
+          />
 
-export default VideoContainer;
+          <View style={{
+              display: 'flex',
+              flexDirection: 'row',
+              width: '100%',
+              height: 50,
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingLeft: 5,
+              paddingRight: 5,
+              opacity: this.visibleControls ? 1 : 0
+            }}
+          >
+            <TouchableWithoutFeedback
+              onPress={this.pause}
+            >
+              <Image
+                style={{width: '10%', height: 30}}
+                source={
+                        this.state.paused ?
+                        require('../res/imgs/play_icon.png') :
+                        require('../res/imgs/pause_icon.png')
+                      }
+                resizeMode='center'
+              />
+            </TouchableWithoutFeedback>
+            <ProgressBarAndroid
+              style={{
+                width: '90%',
+                height: 15
+              }}
+              styleAttr="Horizontal"
+              color="white"
+              indeterminate={false}
+              progress={this.state.progress}
+            />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+
+  generateID = () =>  ('_' + Math.random().toString(36).substr(2, 9));
+
+}
