@@ -8,11 +8,16 @@ export default class VideoContainer extends Component {
 
   constructor(props) {
     super(props);
+    let paused = true;
+
+    if(typeof props.autoPlay === 'boolean') {
+      paused = !props.autoPlay;
+    }
 
     this.state = {
       progress: 0.0,
       seekTo: 0.0,
-      paused: true
+      paused
     };
 
     this.styles = props.style ? props.style : {};
@@ -46,6 +51,9 @@ export default class VideoContainer extends Component {
   }
 
   touched = () => {
+    if(this.props.disableControls) {
+      return;
+    }
     if(this.visibleControls) {
 
       this.visibleControls = false;
@@ -85,7 +93,7 @@ export default class VideoContainer extends Component {
   }
 
   seek = evn => {
-    if(!this.visibleControls) {
+    if(!this.visibleControls || this.props.disableSeekTo) {
       return;
     }
     this.setState({
@@ -95,6 +103,13 @@ export default class VideoContainer extends Component {
   }
 
   render() {
+    let iconPlay = this.props.playIcon ?
+                   this.props.playIcon :
+                   require('../res/imgs/play_icon.png');
+
+    let iconPause = this.props.pauseIcon ?
+                    this.props.pauseIcon :
+                    require('../res/imgs/pause_icon.png');
     return (
       <TouchableWithoutFeedback
         onPress={this.touched}
@@ -136,12 +151,9 @@ export default class VideoContainer extends Component {
             >
               <Image
                 style={{width: '10%', height: 30}}
-                source={
-                        this.state.paused ?
-                        require('../res/imgs/play_icon.png') :
-                        require('../res/imgs/pause_icon.png')
-                      }
+                source={this.state.paused ? iconPlay : iconPause}
                 resizeMode='center'
+                fadeDuration={0}
               />
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback
