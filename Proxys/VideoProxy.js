@@ -27,6 +27,10 @@ export default class VideoContainer extends Component {
     this.visibleControls = false;
     this.mounted = false;
     this.progressBarWidth = 1;
+    this.videoWidth = -1;
+    this.videoHeight = -1;
+    this.containerWidth = 0;
+    this.containerHeight = 0;
   }
 
   componentDidMount() {
@@ -43,10 +47,15 @@ export default class VideoContainer extends Component {
 
     if(data.id === this.id) {
       let progress = (data.currentPosition / data.duration);
-      if(progress === 1) {
+      if(isNaN(progress) || progress < 0 || progress > 1) {
+        progress = 0;
+      }
+      if(data.completed) {
         this.reset();
       }
       this.setState({progress});
+      this.videoWidth = data.width;
+      this.videoHeight = data.height;
     }
   }
 
@@ -86,10 +95,10 @@ export default class VideoContainer extends Component {
   }
 
   reset = () => {
-    if(!this.paused) {
-      this.setState({paused: !this.state.paused});
-    }
-    this.setState({seekTo: 0.0});
+    this.setState({
+                    paused: true,
+                    seekTo: 0.0
+                  });
   }
 
   seek = evn => {
@@ -110,20 +119,40 @@ export default class VideoContainer extends Component {
     let iconPause = this.props.pauseIcon ?
                     this.props.pauseIcon :
                     require('../res/imgs/pause_icon.png');
+
+    let width = '100%';
+    let height = '100%';
+
+    if(this.videoHeight > 0 && this.videoWidth > 0 && !this.props.stretch) {
+      if(this.videoWidth > this.videoHeight) {
+        width = this.containerWidth;
+        height = (width/this.videoWidth)*this.videoHeight;
+      } else {
+        height = this.containerHeight;
+        width = (height/this.videoHeight)*this.videoWidth;
+      }
+    }
+
     return (
       <TouchableWithoutFeedback
         onPress={this.touched}
       >
-        <View style={{
-          ...this.styles,
-          overflow: 'hidden'
-        }}>
+        <View
+          style={{
+            ...this.styles,
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onLayout={evn => {
+                            this.containerWidth = evn.nativeEvent.layout.width;
+                            this.containerHeight = evn.nativeEvent.layout.height;
+                          }}
+        >
           <VideoView style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0
+              width,
+              height,
             }}
             url={this.props.url}
             id={this.id}
