@@ -3,7 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/react-native-androide.svg)](https://www.npmjs.com/package/react-native-androide)
 [![npm dm](https://img.shields.io/npm/dm/react-native-androide.svg)](https://www.npmjs.com/package/react-native-androide)
 [![npm dt](https://img.shields.io/npm/dt/react-native-androide.svg)](https://www.npmjs.com/package/react-native-androide)
-[![deps peer](https://david-dm.org/MatheusAlvesA/react-native-androide/peer-status.svg)](https://david-dm.org/MatheusAlvesA/react-native-androide?type=peer&view=list)
 
 React Native is a amazing framework to create UI, but does not have too much functions likes java applications made to Android do.
 This library is designed to Android developers, and has several functions and components that allow better integrations with the Android system.
