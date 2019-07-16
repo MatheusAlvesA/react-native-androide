@@ -55,7 +55,7 @@ public class VideoViewManager extends SimpleViewManager<RNAVideoView> {
       return;
     }
     videoView.seekTo((int) (percent * videoView.getDuration()));
-    if(percent < 1) {
+    if(percent < 1.0) {
       videoView.setIsCompleted(false);
     }
   }

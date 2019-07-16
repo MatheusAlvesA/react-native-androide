@@ -43,15 +43,17 @@ export default class VideoContainer extends Component {
     this.mounted = false;
   }
 
-  progressListener = data => {
+  generateID = () =>  ('_' + Math.random().toString(36).substr(2, 9));
+
+  progressListener = status => {
     if(!this.mounted) return;
 
-    if(data.id === this.id) {
-      let progress = (data.currentPosition / data.duration);
+    if(status.id === this.id) {
+      let progress = (status.currentPosition / status.duration);
       if(isNaN(progress) || progress < 0 || progress > 1) {
         progress = 0;
       }
-      if(data.completed) {
+      if(status.completed) {
         this.reset();
       }
       this.setState({progress});
@@ -64,6 +66,7 @@ export default class VideoContainer extends Component {
     if(res.id === this.id) {
       this.videoWidth = res.width;
       this.videoHeight = res.height;
+      this.forceUpdate();
     }
   }
 
@@ -71,16 +74,14 @@ export default class VideoContainer extends Component {
     if(this.props.disableControls) {
       return;
     }
-    if(this.visibleControls) {
 
+    if(this.visibleControls) {
       this.visibleControls = false;
       if(this.idCBControlsVisible !== null) {
         clearTimeout(this.idCBControlsVisible);
         this.idCBControlsVisible = null;
       }
-
     } else {
-
       this.visibleControls = true;
       this.idCBControlsVisible = setTimeout(
         () => {
@@ -90,8 +91,8 @@ export default class VideoContainer extends Component {
         },
         5000
       );
-
     }
+
     this.forceUpdate();
   }
 
@@ -99,6 +100,7 @@ export default class VideoContainer extends Component {
     if(!this.visibleControls) {
       return;
     }
+
     this.setState({paused: !this.state.paused});
   }
 
@@ -113,6 +115,7 @@ export default class VideoContainer extends Component {
     if(!this.visibleControls || this.props.disableSeekTo) {
       return;
     }
+
     this.setState({
                     seekTo: ( evn.nativeEvent.locationX /
                                 this.progressBarWidth )
@@ -132,10 +135,10 @@ export default class VideoContainer extends Component {
     let height = '100%';
 
     if(this.videoHeight > 0 && this.videoWidth > 0 && !this.props.stretch) {
-      if(this.videoWidth > this.videoHeight) {
+      if(this.videoWidth > this.videoHeight) {               // Widscreen
         width = this.containerWidth;
         height = (width/this.videoWidth)*this.videoHeight;
-      } else {
+      } else {                                              // Portrait
         height = this.containerHeight;
         width = (height/this.videoHeight)*this.videoWidth;
       }
@@ -158,10 +161,7 @@ export default class VideoContainer extends Component {
                             this.containerHeight = evn.nativeEvent.layout.height;
                           }}
         >
-          <VideoView style={{
-              width,
-              height,
-            }}
+          <VideoView style={{ width, height }}
             id={this.id}
             url={this.props.url}
             paused={this.state.paused}
@@ -213,7 +213,5 @@ export default class VideoContainer extends Component {
       </TouchableWithoutFeedback>
     );
   }
-
-  generateID = () =>  ('_' + Math.random().toString(36).substr(2, 9));
 
 }
