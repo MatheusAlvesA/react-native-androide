@@ -172,7 +172,7 @@ export default class VideoContainer extends Component {
         >
           <VideoView style={{ width, height }}
             id={this.id}
-            url={this.props.url}
+            src={this.props.src}
             paused={this.state.paused}
             progress={this.state.seekTo}
           />

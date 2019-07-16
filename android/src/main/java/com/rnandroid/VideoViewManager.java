@@ -31,9 +31,9 @@ public class VideoViewManager extends SimpleViewManager<RNAVideoView> {
     return new RNAVideoView(reactContext);
   }
 
-  @ReactProp(name="url")
-  public void setVideoPath(RNAVideoView videoView, String urlPath) {
-    videoView.setVideoURI(Uri.parse(urlPath));
+  @ReactProp(name="src")
+  public void setVideoPath(RNAVideoView videoView, String srcPath) {
+    videoView.setVideoURI(Uri.parse(srcPath));
 
     this.updateDimensions(videoView);
     videoView.setIsCompleted(false);
