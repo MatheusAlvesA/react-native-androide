@@ -36,6 +36,7 @@ export default class VideoContainer extends Component {
   componentDidMount() {
     this.mounted = true;
     DeviceEventEmitter.addListener('RNA_videoProgress', this.progressListener);
+    DeviceEventEmitter.addListener('RNA_videoResolutionChanged', this.resolutionChangedListener);
   }
 
   componentWillUnmount() {
@@ -54,8 +55,15 @@ export default class VideoContainer extends Component {
         this.reset();
       }
       this.setState({progress});
-      this.videoWidth = data.width;
-      this.videoHeight = data.height;
+    }
+  }
+
+  resolutionChangedListener = res => {
+    if(!this.mounted) return;
+
+    if(res.id === this.id) {
+      this.videoWidth = res.width;
+      this.videoHeight = res.height;
     }
   }
 
@@ -154,8 +162,8 @@ export default class VideoContainer extends Component {
               width,
               height,
             }}
-            url={this.props.url}
             id={this.id}
+            url={this.props.url}
             paused={this.state.paused}
             progress={this.state.seekTo}
           />
