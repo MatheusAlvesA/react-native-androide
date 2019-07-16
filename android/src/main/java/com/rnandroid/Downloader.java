@@ -71,7 +71,13 @@ public class Downloader extends ReactContextBaseJavaModule {
       return;
     }
 
+    if(this.isDownloadFinished(id)) {
+      p.resolve(false);
+      return;
+    }
+
     int n = this.dm.remove(id);
+
     if(n == 0) {
       p.resolve(false);
     } else {
@@ -172,6 +178,14 @@ public class Downloader extends ReactContextBaseJavaModule {
       progress = ((double) bytes_downloaded) / bytes_total;
     }
     return progress;
+  }
+
+  private boolean isDownloadFinished(Long id) {
+    DownloadManager.Query q = new DownloadManager.Query();
+    q.setFilterById(id);
+    Cursor cur = this.dm.query(q);
+    cur.moveToFirst();
+    return this.isDownloadFinished(cur);
   }
 
   private boolean isDownloadFinished(Cursor cursor) {
