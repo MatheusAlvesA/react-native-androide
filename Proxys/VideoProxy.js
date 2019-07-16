@@ -135,12 +135,20 @@ export default class VideoContainer extends Component {
     let height = '100%';
 
     if(this.videoHeight > 0 && this.videoWidth > 0 && !this.props.stretch) {
-      if(this.videoWidth > this.videoHeight) {               // Widscreen
+      if(this.videoWidth > this.videoHeight) {          // Widscreen
         width = this.containerWidth;
         height = (width/this.videoWidth)*this.videoHeight;
-      } else {                                              // Portrait
+        if(height > this.containerHeight) {            // Incorrect proportion, recalculating
+          height = this.containerHeight;
+          width = (height/this.videoHeight)*this.videoWidth;
+        }
+      } else {                                         // Portrait
         height = this.containerHeight;
         width = (height/this.videoHeight)*this.videoWidth;
+        if(width > this.containerWidth) {              // Incorrect proportion, recalculating
+          width = this.containerWidth;
+          height = (width/this.videoWidth)*this.videoHeight;
+        }
       }
     }
 
@@ -159,6 +167,7 @@ export default class VideoContainer extends Component {
           onLayout={evn => {
                             this.containerWidth = evn.nativeEvent.layout.width;
                             this.containerHeight = evn.nativeEvent.layout.height;
+                            this.forceUpdate();
                           }}
         >
           <VideoView style={{ width, height }}
