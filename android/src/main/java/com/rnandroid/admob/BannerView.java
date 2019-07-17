@@ -7,11 +7,11 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
-class Banner extends ReactViewGroup {
+class BannerView extends ReactViewGroup {
   ReactApplicationContext context = null;
   boolean initializated = false;
 
-  Banner(ReactApplicationContext reactContext) {
+  BannerView(ReactApplicationContext reactContext) {
     super(reactContext);
     this.context = reactContext;
     this.initializeAdMob();
@@ -22,7 +22,7 @@ class Banner extends ReactViewGroup {
   }
 
   private void initializeAdMob() {
-    final Banner that = this;
+    final BannerView that = this;
     MobileAds.initialize(this.context, new OnInitializationCompleteListener() {
       @Override
       public void onInitializationComplete(InitializationStatus initializationStatus) {

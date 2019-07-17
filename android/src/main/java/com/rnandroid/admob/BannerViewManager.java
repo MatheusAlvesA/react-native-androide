@@ -4,19 +4,19 @@ import android.view.View;
 
 import com.facebook.react.uimanager.ViewGroupManager;
 
-class BannerViewManager extends ViewGroupManager<Banner> {
+class BannerViewManager extends ViewGroupManager<BannerView> {
   @Override
   public String getName() {
     return "BannerViewManager";
   }
 
   @Override
-  protected Banner createViewInstance(ThemedReactContext themedReactContext) {
-    return new Banner(themedReactContext);
+  protected BannerView createViewInstance(ThemedReactContext themedReactContext) {
+    return new BannerView(themedReactContext);
   }
 
   @Override
-  public void addView(Banner parent, View child, int index) {
+  public void addView(BannerView parent, View child, int index) {
     throw new RuntimeException("AdMobView cannot have subviews");
   }
 
