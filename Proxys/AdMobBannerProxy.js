@@ -20,7 +20,12 @@ export default class AdMobBanner extends Component {
 
   render() {
     return (
-      <BannerView />
+      <BannerView
+        style={{
+          width: '100%',
+          height: 100
+        }}
+      />
     );
   }
 
