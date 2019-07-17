@@ -3,8 +3,9 @@ package com.rnandroid.admob;
 import android.view.View;
 
 import com.facebook.react.uimanager.ViewGroupManager;
+import com.facebook.react.uimanager.ThemedReactContext;
 
-class BannerViewManager extends ViewGroupManager<BannerView> {
+public class BannerViewManager extends ViewGroupManager<BannerView> {
   @Override
   public String getName() {
     return "BannerViewManager";

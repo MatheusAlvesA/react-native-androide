@@ -1,5 +1,7 @@
 package com.rnandroid;
 
+import com.rnandroid.admob.BannerViewManager;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +33,7 @@ public class RNAndroidPackage implements ReactPackage {
       List<ViewManager> viewManagers = new ArrayList<>();
 
       viewManagers.add(new VideoViewManager());
+      viewManagers.add(new BannerViewManager());
 
       return viewManagers;
     }
