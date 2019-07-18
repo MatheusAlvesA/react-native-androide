@@ -36,12 +36,19 @@ public class BannerView extends ReactViewGroup {
     if (this.mAdView != null) this.mAdView.destroy();
 
     AdView adView = new AdView(this.context);
-    adView.setAdSize(AdSize.BANNER);
-    adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111"); //DEBUG id
     adView.setAdListener(this.getAdMobEventListener());
 
     this.addView(adView);
     this.mAdView = adView;
+  }
+
+  public void setAdSize(AdSize size) {
+    this.mAdView.setAdSize(size);
+    this.loadIfIsReady();
+  }
+
+  public void setAdUnitID(String id) {
+    this.mAdView.setAdUnitId(id);
     this.loadIfIsReady();
   }
 
@@ -54,13 +61,8 @@ public class BannerView extends ReactViewGroup {
       return false;
     }
 
-    this.loadAd();
+    this.mAdView.loadAd(new AdRequest.Builder().build());
     return true;
-  }
-
-  public void loadAd() {
-    AdRequest adRequest = new AdRequest.Builder().build();
-    this.mAdView.loadAd(adRequest);
   }
 
   private void sendOnSizeChangeEvent() {

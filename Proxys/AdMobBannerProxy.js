@@ -62,6 +62,8 @@ export default class AdMobBanner extends Component {
             height: this.state.height
           }
         ]}
+        adSize={this.props.adSize}
+        adUnitID={this.props.adUnitID}
         onSizeChange={this.handleSizeChange}
         onFailedToLoad={this.handleFailedToLoad}
         onLoad={this.handleOnLoad}
