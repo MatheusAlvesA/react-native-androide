@@ -17,6 +17,8 @@ import com.google.android.gms.ads.AdSize;
 public class BannerView extends ReactViewGroup {
   private ThemedReactContext context = null;
   private AdView mAdView = null;
+  private AdSize size = null;
+  private String id = null;
 
   public static String EVENT_AD_SIZE_CHANGED = "onSizeChange";
   public static String EVENT_AD_LOAD_FAIL = "onFailedToLoad";
@@ -29,11 +31,13 @@ public class BannerView extends ReactViewGroup {
     super(reactContext);
     this.context = reactContext;
     MobileAds.initialize(this.context);
-    this.createAdView();
   }
 
   public void createAdView() {
-    if (this.mAdView != null) this.mAdView.destroy();
+    if (this.mAdView != null) {
+      this.removeView(this.mAdView);
+      this.mAdView.destroy();
+    }
 
     AdView adView = new AdView(this.context);
     adView.setAdListener(this.getAdMobEventListener());
@@ -43,12 +47,23 @@ public class BannerView extends ReactViewGroup {
   }
 
   public void setAdSize(AdSize size) {
-    this.mAdView.setAdSize(size);
-    this.loadIfIsReady();
+    this.size = size;
+    this.updateConfiguration();
   }
 
   public void setAdUnitID(String id) {
-    this.mAdView.setAdUnitId(id);
+    this.id = id;
+    this.updateConfiguration();
+  }
+
+  public void updateConfiguration() {
+    this.createAdView();
+    if(this.size != null) {
+      this.mAdView.setAdSize(this.size);
+    }
+    if(this.id != null) {
+      this.mAdView.setAdUnitId(this.id);
+    }
     this.loadIfIsReady();
   }
 
