@@ -3,7 +3,7 @@ package com.rnandroid.admob;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.views.view.ReactViewGroup;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.facebook.react.uimanager.PixelUtil;
 
 import com.google.android.gms.ads.MobileAds;
@@ -17,6 +17,9 @@ import com.google.android.gms.ads.AdSize;
 public class BannerView extends ReactViewGroup {
   private ThemedReactContext context = null;
   private AdView mAdView = null;
+
+  public static String EVENT_AD_SIZE_CHANGED = "onSizeChange";
+  public static String EVENT_AD_LOAD_FAIL = "onFailedToLoad";
 
   BannerView(ThemedReactContext reactContext) {
     super(reactContext);
@@ -66,9 +69,10 @@ public class BannerView extends ReactViewGroup {
       event.putInt("width", width);
       event.putInt("height", height);
 
-      this.context
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-      .emit("RNAAdMob_sizeChange", event);
+      this.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                      getId(),
+                      EVENT_AD_SIZE_CHANGED,
+                      event);
   }
 
   public AdListener getAdMobEventListener() {
@@ -89,7 +93,29 @@ public class BannerView extends ReactViewGroup {
 
         @Override
         public void onAdFailedToLoad(int errorCode) {
-            // Code to be executed when an ad request fails.
+          WritableNativeMap event = new WritableNativeMap();
+          switch (errorCode) {
+              case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                  event.putString("message", "An invalid response was received from the ad server.");
+                  break;
+              case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                  event.putString("message", "The ad unit ID was incorrect.");
+                  break;
+              case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                  event.putString("message", "The ad request was unsuccessful due to network connectivity.");
+                  break;
+              case AdRequest.ERROR_CODE_NO_FILL:
+                  event.putString("message", "The ad request was successful, but no ad was returned due to lack of ad inventory.");
+                  break;
+              default:
+                  event.putString("message", "Unknown error");
+                  break;
+          }
+
+          that.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                          getId(),
+                          EVENT_AD_LOAD_FAIL,
+                          event);
         }
 
         @Override

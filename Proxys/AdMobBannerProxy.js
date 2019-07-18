@@ -7,24 +7,39 @@ export default class AdMobBanner extends Component {
 
   constructor(props) {
     super(props);
-    //TODO
+
+    this.state = {
+      width: 0,
+      height: 0
+    }
   }
 
-  componentDidMount() {
-    this.mounted = true;
+  handleSizeChange = dimensions => {
+    const { width, height } = dimensions.nativeEvent;
+    this.setState({ width, height });
+    if (this.props.onSizeChange) {
+      this.props.onSizeChange({ width, height });
+    }
   }
 
-  componentWillUnmount() {
-    this.mounted = false;
+  handleFailedToLoad = error => {
+    if (this.props.onFailedToLoad) {
+      this.props.onFailedToLoad(error.nativeEvent.message);
+    }
   }
 
   render() {
     return (
       <BannerView
-        style={{
-          width: '100%',
-          height: 100
-        }}
+        style={[
+          this.props.style,
+          {
+            width: this.state.width,
+            height: this.state.height
+          }
+        ]}
+        onSizeChange={this.handleSizeChange}
+        onFailedToLoad={this.handleFailedToLoad}
       />
     );
   }
