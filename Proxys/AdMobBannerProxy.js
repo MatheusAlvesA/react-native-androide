@@ -28,6 +28,30 @@ export default class AdMobBanner extends Component {
     }
   }
 
+  handleOnLoad = () => {
+    if (this.props.onLoad) {
+      this.props.onLoad();
+    }
+  }
+
+  handleOnOpen = () => {
+    if (this.props.onOpen) {
+      this.props.onOpen();
+    }
+  }
+
+  handleOnClick= () => {
+    if (this.props.onClick) {
+      this.props.onClick();
+    }
+  }
+
+  handleOnClose= () => {
+    if (this.props.onClose) {
+      this.props.onClose();
+    }
+  }
+
   render() {
     return (
       <BannerView
@@ -40,6 +64,10 @@ export default class AdMobBanner extends Component {
         ]}
         onSizeChange={this.handleSizeChange}
         onFailedToLoad={this.handleFailedToLoad}
+        onLoad={this.handleOnLoad}
+        onOpen={this.handleOnOpen}
+        onClick={this.handleOnClick}
+        onClose={this.handleOnClose}
       />
     );
   }

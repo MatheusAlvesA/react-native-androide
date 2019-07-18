@@ -20,11 +20,16 @@ public class BannerView extends ReactViewGroup {
 
   public static String EVENT_AD_SIZE_CHANGED = "onSizeChange";
   public static String EVENT_AD_LOAD_FAIL = "onFailedToLoad";
+  public static String EVENT_AD_LOADED = "onLoad";
+  public static String EVENT_AD_CLICKED = "onClick";
+  public static String EVENT_AD_OPENED = "onOpen";
+  public static String EVENT_AD_CLOSED = "onClose";
 
   BannerView(ThemedReactContext reactContext) {
     super(reactContext);
     this.context = reactContext;
-    this.initializeAdMob();
+    MobileAds.initialize(this.context);
+    this.createAdView();
   }
 
   public void createAdView() {
@@ -37,16 +42,20 @@ public class BannerView extends ReactViewGroup {
 
     this.addView(adView);
     this.mAdView = adView;
+    this.loadIfIsReady();
   }
 
-  private void initializeAdMob() {
-    MobileAds.initialize(this.context, new OnInitializationCompleteListener() {
-      @Override
-      public void onInitializationComplete(InitializationStatus initializationStatus) {
-        createAdView();
-        loadAd();
-      }
-    });
+  public boolean loadIfIsReady() {
+    if(this.mAdView == null) {
+      return false;
+    }
+    String uId = this.mAdView.getAdUnitId();
+    if(this.mAdView.getAdSize() == null || uId == null || uId.equals("")) {
+      return false;
+    }
+
+    this.loadAd();
+    return true;
   }
 
   public void loadAd() {
@@ -87,8 +96,12 @@ public class BannerView extends ReactViewGroup {
           int top = that.mAdView.getTop();
           that.mAdView.measure(width, height);
           that.mAdView.layout(left, top, left + width, top + height);
+
           sendOnSizeChangeEvent();
-          // TODO sento event to JS
+          that.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                          getId(),
+                          EVENT_AD_LOADED,
+                          null);
         }
 
         @Override
@@ -120,24 +133,31 @@ public class BannerView extends ReactViewGroup {
 
         @Override
         public void onAdOpened() {
-            // Code to be executed when an ad opens an overlay that
-            // covers the screen.
+          that.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                          getId(),
+                          EVENT_AD_OPENED,
+                          null);
         }
 
         @Override
         public void onAdClicked() {
-            // Code to be executed when the user clicks on an ad.
+          that.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                          getId(),
+                          EVENT_AD_CLICKED,
+                          null);
         }
 
         @Override
         public void onAdLeftApplication() {
-            // Code to be executed when the user has left the app.
+            /* EMPTY */
         }
 
         @Override
         public void onAdClosed() {
-            // Code to be executed when the user is about to return
-            // to the app after tapping on an ad.
+          that.context.getJSModule(RCTEventEmitter.class).receiveEvent(
+                          getId(),
+                          EVENT_AD_CLOSED,
+                          null);
         }
     });
   }
