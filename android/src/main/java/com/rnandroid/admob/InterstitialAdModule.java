@@ -11,14 +11,18 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class InterstitialAdModule extends ReactContextBaseJavaModule {
 
   private InterstitialAd mInterstitialAd;
   private Promise mRequestAdPromise;
+  private ReactApplicationContext context;
 
   public InterstitialAdModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    this.context = reactContext;
     this.mInterstitialAd = new InterstitialAd(reactContext);
 
     final InterstitialAdModule that = this;
@@ -114,18 +118,34 @@ public class InterstitialAdModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onAdLoaded() {
-            //TODO
             that.mRequestAdPromise.resolve(true);
         }
 
         @Override
         public void onAdOpened() {
-            //TODO
+          WritableNativeMap event = new WritableNativeMap();
+          event.putString("id", that.mInterstitialAd.getAdUnitId());
+          that.context
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("AdMob_InterstitialAdOpened", event);
+        }
+
+        @Override
+        public void onAdClicked() {
+          WritableNativeMap event = new WritableNativeMap();
+          event.putString("id", that.mInterstitialAd.getAdUnitId());
+          that.context
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("AdMob_InterstitialAdClicked", event);
         }
 
         @Override
         public void onAdClosed() {
-            //TODO
+          WritableNativeMap event = new WritableNativeMap();
+          event.putString("id", that.mInterstitialAd.getAdUnitId());
+          that.context
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("AdMob_InterstitialAdClosed", event);
         }
 
       });
