@@ -1,6 +1,7 @@
 package com.rnandroid;
 
 import com.rnandroid.admob.BannerViewManager;
+import com.rnandroid.admob.InterstitialAdModule;;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,7 @@ public class RNAndroidPackage implements ReactPackage {
       modules.add(new KeepAwake(reactContext));
       modules.add(new FileSystem(reactContext));
       modules.add(new Downloader(reactContext));
+      modules.add(new InterstitialAdModule(reactContext));
 
       return modules;
     }

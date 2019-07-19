@@ -8,12 +8,14 @@ import VideoContainer from './Proxys/VideoProxy.js';
 import AdMobBanner from './Proxys/AdMobBannerProxy.js';
 
 
-const { AndroidToast, KeepAwake, VideoViewManager } = NativeModules;
+const { AndroidToast, KeepAwake,
+        VideoViewManager, InterstitialAdModule } = NativeModules;
 
 module.exports = {
   AndroidToast,
   KeepAwake,
   AdMobBanner,
+  AdMobInterstitial: InterstitialAdModule,
   Video: VideoContainer,
   Downloader: DownloaderProxy,
   FileSystem: FileSystemProxy,
