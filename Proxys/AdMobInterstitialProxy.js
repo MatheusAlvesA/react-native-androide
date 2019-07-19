@@ -4,13 +4,13 @@ const { InterstitialAdModule } = NativeModules;
 
 let AdMobInterstitialProxy = {
 	...InterstitialAdModule,
-  setInterstitialOpenedListener: function(cb) {
+  setOpenedListener: function(cb) {
     return DeviceEventEmitter.addListener('AdMob_InterstitialAdOpened', cb);
 	},
-  setInterstitialClosedListener: function(cb) {
+  setClosedListener: function(cb) {
     return DeviceEventEmitter.addListener('AdMob_InterstitialAdClosed', cb);
   },
-  setInterstitialClickedListener: function(cb) {
+  setClickedListener: function(cb) {
     return DeviceEventEmitter.addListener('AdMob_InterstitialAdClicked', cb);
   }
 };
