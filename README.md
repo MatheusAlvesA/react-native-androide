@@ -13,13 +13,31 @@ Full documentation can be found in https://github.com/MatheusAlvesA/react-native
 
 `$ npm install react-native-androide --save`
 
-### Mostly automatic installation (Recommended)
+Since the version 1.0.0 of this library an additional step of installation is **required**.
+
+This lib implements the AdMob. Unfortunately the AdMob platform requires an application id placed on the Manifest File.
+The absence of this parameter will cause Crash in your App. To solve this issue, you only needs to put the oficial test application id on the Manifest File.
+
+Open the Manifest file located in `android\app\src\main\AndroidManifest.xml` and add the test id inside the `application` tag:
+```XML
+<application>
+
+   ...
+
+  <meta-data
+    android:name="com.google.android.gms.ads.APPLICATION_ID"
+    android:value="ca-app-pub-3940256099942544~3347511713"
+  />
+</application>
+```
+
+### Mostly automatic linking (Recommended)
 
 > If you are using React Native >= v0.60.0, the linking steps are not required.
 
 `$ react-native link react-native-androide`
 
-### Manual installation
+### Manual linking
 
 1. Open up `android/app/src/main/java/[...]/MainApplication.java`
   - Add `import com.rnandroid.RNAndroidPackage;` to the imports at the top of the file
