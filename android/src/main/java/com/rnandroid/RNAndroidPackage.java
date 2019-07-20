@@ -1,7 +1,8 @@
 package com.rnandroid;
 
 import com.rnandroid.admob.BannerViewManager;
-import com.rnandroid.admob.InterstitialAdModule;;
+import com.rnandroid.admob.InterstitialAdModule;
+import com.rnandroid.admob.RewardedVideoModule;;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ public class RNAndroidPackage implements ReactPackage {
       modules.add(new FileSystem(reactContext));
       modules.add(new Downloader(reactContext));
       modules.add(new InterstitialAdModule(reactContext));
+      modules.add(new RewardedVideoModule(reactContext));
 
       return modules;
     }

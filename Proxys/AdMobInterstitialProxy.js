@@ -2,7 +2,7 @@ import { NativeModules, DeviceEventEmitter } from 'react-native';
 
 const { InterstitialAdModule } = NativeModules;
 
-let AdMobInterstitialProxy = {
+const AdMobInterstitialProxy = {
 	...InterstitialAdModule,
   setOpenedListener: function(cb) {
     return DeviceEventEmitter.addListener('AdMob_InterstitialAdOpened', cb);
