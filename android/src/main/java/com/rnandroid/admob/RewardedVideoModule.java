@@ -56,7 +56,7 @@ public class RewardedVideoModule extends ReactContextBaseJavaModule implements R
       public void run() {
 
         if (that.mRewardedVideoAd.isLoaded()) {
-            promise.reject("ERROR", "Ad is already loading or loaded.");
+            promise.resolve(true);
         } else {
           that.mRewardedVideoAd.loadAd(that.adUnitID, new AdRequest.Builder().build());
           that.mRequestAdPromise = promise;
