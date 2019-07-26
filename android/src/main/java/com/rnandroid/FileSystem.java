@@ -47,9 +47,18 @@ public class FileSystem extends ReactContextBaseJavaModule {
     constants.put("RingtoneDir", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES).getAbsolutePath());
     constants.put("DataAppDir", this.context.getApplicationInfo().dataDir);
     constants.put("RootDir", Environment.getRootDirectory().getAbsolutePath());
+    constants.put("ExternalFilesDir", this.getExternalFilesDir());
     constants.put("separator", File.separator);
 
     return constants;
+  }
+
+  private String getExternalFilesDir() {
+    File externalDirectory = this.context.getExternalFilesDir(null);
+    if(externalDirectory != null && externalDirectory.exists()) {
+      return externalDirectory.getAbsolutePath();
+    }
+    return null;
   }
 
   @ReactMethod
