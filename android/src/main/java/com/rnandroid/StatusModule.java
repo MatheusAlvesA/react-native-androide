@@ -9,10 +9,19 @@ import android.os.StatFs;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 
@@ -30,11 +39,13 @@ public class StatusModule extends ReactContextBaseJavaModule {
   BatteryManager battery = null;
   ReactApplicationContext reactContext = null;
   WifiManager wfManager = null;
+  FusedLocationProviderClient fusedLocationClient;
 
   public StatusModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
-    this.battery = (BatteryManager)reactContext.getSystemService(reactContext.BATTERY_SERVICE);
+    this.battery = (BatteryManager) reactContext.getSystemService(reactContext.BATTERY_SERVICE);
+    this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(reactContext);
   }
 
   @Override
@@ -65,6 +76,37 @@ public class StatusModule extends ReactContextBaseJavaModule {
         || Build.MANUFACTURER.contains("Genymotion")
         || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
         || "google_sdk".equals(Build.PRODUCT);
+  }
+
+  @ReactMethod
+  public void getLastKnownLocation(final Promise promise) {
+    this.fusedLocationClient.getLastLocation()
+            .addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        WritableMap wm = new WritableNativeMap();
+                        wm.putDouble("latitude", location.getLatitude());
+                        wm.putDouble("longitude", location.getLongitude());
+                        promise.resolve(wm);
+                    } else {
+                      promise.reject("ERROR", "Unknown location");
+                    }
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(Exception e) {
+                    promise.reject(e);
+                }
+            })
+            .addOnCanceledListener(new OnCanceledListener() {
+                @Override
+                public void onCanceled() {
+                    promise.reject("ERROR", "Task canceled");
+                }
+            });
   }
 
   // Using deprecated getConfiguration().locale only if the api leve of device is old
